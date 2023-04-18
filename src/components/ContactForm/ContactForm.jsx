@@ -7,10 +7,14 @@ import {
   Input,
 } from 'components/ContactForm/ContactForm.styled';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 export const ContactForm = ({ onAddContact }) => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+
+  const value = useSelector(state => state.filter);
+  console.log(value);
 
   const handleSubmit = e => {
     e.preventDefault();
