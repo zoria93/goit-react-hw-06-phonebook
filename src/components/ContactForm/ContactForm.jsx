@@ -1,4 +1,8 @@
-import PropTypes from 'prop-types';
+import { addContacts } from 'redux/contactsSlice';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useState } from 'react';
+import { nanoid } from 'nanoid';
 import {
   Form,
   Label,
@@ -6,19 +10,16 @@ import {
   Span,
   Input,
 } from 'components/ContactForm/ContactForm.styled';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
 
-export const ContactForm = ({ onAddContact }) => {
+export const ContactForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-
-  const value = useSelector(state => state.filter);
-  console.log(value);
+  const contacts = useSelector(state => state.contacts);
+  const dispatch = useDispatch();
 
   const handleSubmit = e => {
     e.preventDefault();
-    onAddContact(name, number);
+    addContact();
     reset();
   };
 
@@ -35,6 +36,29 @@ export const ContactForm = ({ onAddContact }) => {
       default:
         alert('Input error');
     }
+  };
+
+  const addContact = () => {
+    const duplicateName = contacts.find(
+      contact =>
+        [...contact.name]
+          .sort((a, b) => a.localeCompare(b))
+          .join('')
+          .toLowerCase() ===
+        [...name]
+          .sort((a, b) => a.localeCompare(b))
+          .join('')
+          .toLowerCase()
+    );
+    if (duplicateName) {
+      return alert(`${name} is already in contacts`);
+    }
+    const newContact = {
+      id: nanoid(),
+      name,
+      number,
+    };
+    dispatch(addContacts(newContact));
   };
 
   const reset = () => {
@@ -71,8 +95,4 @@ export const ContactForm = ({ onAddContact }) => {
       <Button type="submit">Add contact</Button>
     </Form>
   );
-};
-
-ContactForm.protoType = {
-  onAddContact: PropTypes.func.isRequired,
 };
